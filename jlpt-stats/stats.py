@@ -55,6 +55,15 @@ class KanjiStats(object):
             return ("%(gradename)s: %(count)s of %(total)s (%(percent)0.1f%%).") % d
         else:
             return ("%(count)s %(gradename)s kanji.") % d
+			
+    # FIXME: as it's html, the width doesn't matter
+    def kanjiLearnTimePrevisionStr(self, gradename, count, total=0, width=0):
+        d = {'count': self.rjustfig(count, width), 'gradename': gradename}
+        if total:
+            d['days'] = round((total-count)/3)
+            return ("%(gradename)s: %(days)s days left to learn all.") % d
+        else:
+            return ("")
 
     def rjustfig(self, n, width):
         n = unicode(n)
@@ -95,10 +104,16 @@ where c.nid = n.id and mid = ? and c.queue > 0
                # total kanji
                ("<li>%d total unique kanji.</li>") %
                sum([c[1] for c in counts]))
-
+		#jlpt level
         out += "</ul><p/>" + (u"JLPT levels:") + "<p/><ul>"
         L = ["<li>" + self.kanjiCountStr(c[0],c[1],c[2], width=3) + "</li>"
-             for c in counts[1:8]]
+			for c in counts[1:8]]
+        out += "".join(L)
+        out += "</ul>"
+		#time to learn
+        out += "</ul><p/>" + (u"Time to learn:") + "<p/><ul>"
+        L = ["<li>" + self.kanjiLearnTimePrevisionStr(c[0],c[1],c[2], width=3) + "</li>"
+			for c in counts[1:8]]
         out += "".join(L)
         out += "</ul>"
         return out
