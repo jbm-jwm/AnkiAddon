@@ -60,7 +60,16 @@ class KanjiStats(object):
     def kanjiLearnTimePrevisionStr(self, gradename, count, total=0, width=0):
         d = {'count': self.rjustfig(count, width), 'gradename': gradename}
         if total:
-            d['days'] = round((total-count)/3)
+            if gradename == "JLPT 5":
+                d['days'] = round((total-count)/3)
+            if gradename == "JLPT 4":
+                d['days'] = round((total-count)/3)
+            if gradename == "JLPT 3":
+                d['days'] = round((total-count)/1)
+            if gradename == "JLPT 2":
+                d['days'] = round((total-count)/1)
+            if gradename == "JLPT 1":
+                d['days'] = round((total-count)/1)
             return ("%(gradename)s: %(days)s days left to learn all.") % d
         else:
             return ("")
