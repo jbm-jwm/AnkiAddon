@@ -55,7 +55,7 @@ class KanjiStats(object):
             return ("%(gradename)s: %(count)s of %(total)s (%(percent)0.1f%%).") % d
         else:
             return ("%(count)s %(gradename)s kanji.") % d
-			
+
     # FIXME: as it's html, the width doesn't matter
     def kanjiLearnTimePrevisionStr(self, gradename, count, total=0, width=0):
         d = {'count': self.rjustfig(count, width), 'gradename': gradename}
@@ -65,12 +65,15 @@ class KanjiStats(object):
             if gradename == "JLPT 4":
                 d['days'] = round((total-count)/3)
             if gradename == "JLPT 3":
-                d['days'] = round((total-count)/1)
+                d['days'] = round((total-count)/2)
             if gradename == "JLPT 2":
                 d['days'] = round((total-count)/1)
             if gradename == "JLPT 1":
                 d['days'] = round((total-count)/1)
-            return ("%(gradename)s: %(days)s days left to learn all.") % d
+            if d['days'] == 0:
+                return ("%(gradename)s: Learning completed.") % d
+            else:
+                return ("%(gradename)s: %(days)s days left to learn all.") % d
         else:
             return ("")
 
@@ -110,9 +113,15 @@ where c.nid = n.id and mid = ? and c.queue > 0
         out = ((("<h1>Kanji statistics</h1>The seen cards in this %s "
                  "contain:") % (self.lim and "deck" or "collection")) +
                "<ul>" +
-               # total kanji
+               # total kanji unique
                ("<li>%d total unique kanji.</li>") %
                sum([c[1] for c in counts]))
+        count = sum([c[1] for c in counts])
+        d = {'count': self.rjustfig(count, 3)}
+        total = sum([c[2] for c in counts])
+        d['total'] = self.rjustfig(total,3)
+        d['percent'] = float(count/total*100)
+        out += ("<li>Total : %(count)s of %(total)s (%(percent)0.1f%%).</li>") % d
 		#jlpt level
         out += "</ul><p/>" + (u"JLPT levels:") + "<p/><ul>"
         L = ["<li>" + self.kanjiCountStr(c[0],c[1],c[2], width=3) + "</li>"
